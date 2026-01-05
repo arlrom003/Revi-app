@@ -1,0 +1,20 @@
+{
+  "name": "revi-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.86.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "mammoth": "^1.11.0",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^1.1.4"
+  }
+}
