@@ -1,56 +1,60 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import authRoutes from './routes/auth.js';
-import decksRoutes from './routes/decks.js';
-import cardsRoutes from './routes/cards.js';
-import reviewsRoutes from './routes/reviews.js';
-import uploadRoutes from './routes/upload.js';
-import analyticsRoutes from './routes/analytics.js';
+// backend/server.js
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+
+import uploadRoutes from "./routes/upload.js";
+import deckRoutes from "./routes/decks.js";
+import cardRoutes from "./routes/cards.js";
+import reviewRoutes from "./routes/reviews.js";
+import analyticsRoutes from "./routes/analytics.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://10.0.2.2:5173",
+      "http://10.0.2.2:3000",
+      "https://revi-app.onrender.com",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-User-Id"],
+  })
+);
+
 app.use(express.json());
-
-// Request logging
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  next();
-});
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/decks', decksRoutes);
-app.use('/api/cards', cardsRoutes);
-app.use('/api/reviews', reviewsRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/analytics', analyticsRoutes);  // This should mount analytics routes at /api/analytics
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.get("/", (req, res) => {
+  res.json({ message: "Revi API is running!" });
 });
+
+// ROUTES
+app.use("/api", uploadRoutes);      // /api/upload-file, /api/generate-flashcards
+app.use("/api/decks", deckRoutes);  // /api/decks/*
+app.use("/api", cardRoutes);        // /api/cards
+app.use("/api", reviewRoutes);      // /api/review-sessions
+app.use("/api", analyticsRoutes);   // /api/analytics/*
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: 'Not found' });
+  res.status(404).json({ error: "Route not found", path: req.path });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error("Server Error:", err.message);
+  res.status(500).json({ error: err.message || "Something went wrong!" });
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
