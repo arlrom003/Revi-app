@@ -4,7 +4,7 @@ import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.get('/dashboard', requireAuth, async (req, res) => {
+router.get('/dashboard', async (req, res) => {
   try {
     const { data: decks } = await supabase
       .from('decks')

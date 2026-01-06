@@ -23,7 +23,7 @@ const getUserSupabaseClient = (token) => {
 };
 
 // Get all decks for user
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     const supabase = getUserSupabaseClient(token);
@@ -43,7 +43,7 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // Get single deck with cards
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     const supabase = getUserSupabaseClient(token);

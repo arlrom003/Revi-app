@@ -5,7 +5,7 @@ import { requireAuth } from '../middleware/auth.js';
 const router = express.Router();
 
 // Add card to deck
-router.post('/cards', requireAuth, async (req, res) => {
+router.post('/cards', async (req, res) => {
   try {
     const { deck_id, question, answer } = req.body;
     
