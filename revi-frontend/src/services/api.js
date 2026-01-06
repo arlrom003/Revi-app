@@ -28,16 +28,6 @@ export const uploadFile = async (formData) => {
   return response.data;
 };
 
-export const generateFlashcards = async (text, numCards = 10) => {
-  const headers = await getAuthHeaders();
-  const response = await axios.post(
-    `${API_URL}/generate-flashcards`,
-    { text, numCards },
-    { headers }
-  );
-  return response.data;
-};
-
 // Decks
 export const createDeck = async (deckData) => {
   const headers = await getAuthHeaders();
@@ -121,10 +111,26 @@ export const getAnalyticsOverview = async () => {
   return response.data;
 };
 
+// History from reviews.js: GET /api/history returns an array
 export const getHistory = async () => {
   const headers = await getAuthHeaders();
-  const response = await axios.get(`${API_URL}/analytics/history`, {
+  const response = await axios.get(`${API_URL}/history`, {
     headers,
+  });
+  return response.data; // plain array
+};
+export const changePassword = async (newPassword) => {
+  // Supabase client-side update password for signed-in user [web:23]
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+  return { success: true };
+};
+
+export const deleteAccount = async (confirmText) => {
+  const headers = await getAuthHeaders();
+  const response = await axios.delete(`${API_URL}/account`, {
+    headers,
+    data: { confirmText },
   });
   return response.data;
 };

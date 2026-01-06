@@ -8,6 +8,9 @@ import deckRoutes from "./routes/decks.js";
 import cardRoutes from "./routes/cards.js";
 import reviewRoutes from "./routes/reviews.js";
 import analyticsRoutes from "./routes/analytics.js";
+import accountRoutes from "./routes/account.js";
+
+
 
 dotenv.config();
 
@@ -43,6 +46,8 @@ app.use("/api/decks", deckRoutes);  // /api/decks/*
 app.use("/api", cardRoutes);        // /api/cards
 app.use("/api", reviewRoutes);      // /api/review-sessions
 app.use("/api", analyticsRoutes);   // /api/analytics/*
+app.use("/api", accountRoutes); // DELETE /api/account
+
 
 // 404 handler
 app.use((req, res) => {

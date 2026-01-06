@@ -1,3 +1,4 @@
+// src/pages/DeckDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getDeck, deleteDeck } from "../services/api";
@@ -17,7 +18,6 @@ export default function DeckDetail() {
         setLoading(true);
         setError("");
 
-        // Don't fetch when navigating to /decks/new
         if (!deckId || deckId === "new") {
           setLoading(false);
           setError(
@@ -30,9 +30,9 @@ export default function DeckDetail() {
           return;
         }
 
-        const data = await getDeck(deckId); // expects { deck, cards } from backend
+        const data = await getDeck(deckId); // { deck, cards }
         if (!data || !data.deck) {
-          setError("Deck not found");
+          setError("Deck not found.");
           setDeck(null);
           setCards([]);
           return;
@@ -42,7 +42,7 @@ export default function DeckDetail() {
         setCards(Array.isArray(data.cards) ? data.cards : []);
       } catch (err) {
         console.error("Error loading deck", err);
-        setError("Failed to load deck");
+        setError("Failed to load deck.");
         setDeck(null);
         setCards([]);
       } finally {
@@ -54,14 +54,18 @@ export default function DeckDetail() {
   }, [deckId]);
 
   const handleDeleteDeck = async () => {
-    if (!window.confirm(`Are you sure you want to delete "${deck.name}"? This action cannot be undone.`)) {
+    if (!deck) return;
+    if (
+      !window.confirm(
+        `Delete "${deck.name}"? This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
     try {
       setDeleting(true);
       await deleteDeck(deckId);
-      // Navigate back to dashboard after successful deletion
       navigate("/dashboard");
     } catch (err) {
       console.error("Error deleting deck:", err);
@@ -80,77 +84,97 @@ export default function DeckDetail() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl text-gray-600">Loading deck...</div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-indigo-500 text-lg font-medium">
+          Loading deck…
+        </div>
       </div>
     );
   }
 
   if (error || !deck) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
         <button
+          type="button"
           onClick={() => navigate(-1)}
-          className="text-sm text-blue-600 mb-4"
+          className="text-sm text-indigo-600 hover:text-indigo-700"
         >
-          Back
+          ← Back
         </button>
-        <h1 className="text-2xl font-bold mb-2">Deck</h1>
-        <p className="text-red-500">{error || "This deck could not be loaded."}</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-red-100 p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Deck not found
+          </h1>
+          <p className="text-sm text-red-600">
+            {error || "This deck could not be loaded."}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
       <button
+        type="button"
         onClick={() => navigate(-1)}
-        className="text-sm text-blue-600 mb-2"
+        className="text-sm text-indigo-600 hover:text-indigo-700"
       >
-        Back
+        ← Back
       </button>
 
-      <div className="bg-white rounded-xl shadow p-6">
-        <div className="flex justify-between items-start mb-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold mb-1">{deck.name}</h1>
-            <p className="text-gray-600">{deck.description}</p>
+            <h1 className="text-3xl font-bold text-gray-900">{deck.name}</h1>
+            {deck.description && (
+              <p className="text-sm text-gray-600 mt-1">{deck.description}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-2">
+              {cards.length} card{cards.length === 1 ? "" : "s"}
+            </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
+              type="button"
               onClick={handleStartReview}
               disabled={cards.length === 0}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-60"
             >
-              Start Review Session
+              Start review
             </button>
             <button
+              type="button"
               onClick={handleDeleteDeck}
               disabled={deleting}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 disabled:opacity-60"
             >
-              {deleting ? "Deleting..." : "Delete Deck"}
+              Delete deck
             </button>
           </div>
         </div>
 
-        <div className="mt-4 mb-6 border-t pt-4">
-          <h2 className="text-xl font-semibold mb-2">Cards ({cards.length})</h2>
+        <div className="pt-4 border-t border-gray-100 space-y-3">
+          <h2 className="text-lg font-semibold text-gray-900">Cards</h2>
           {cards.length === 0 ? (
-            <p className="text-gray-500">
-              No cards in this deck yet. Use the review or edit flows you already set up.
+            <p className="text-sm text-gray-600">
+              No cards in this deck yet. Add cards, then start a review
+              session.
             </p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {cards.map((card, idx) => (
                 <div
                   key={card.id ?? idx}
-                  className="border rounded-lg p-3 bg-gray-50 flex flex-col gap-1"
+                  className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 space-y-1"
                 >
-                  <div className="font-semibold text-gray-800">
+                  <p className="text-sm font-medium text-gray-900">
                     Q{idx + 1}. {card.question}
-                  </div>
-                  <div className="text-gray-700">A. {card.answer}</div>
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    <span className="font-semibold">A.</span> {card.answer}
+                  </p>
                 </div>
               ))}
             </div>

@@ -53,21 +53,4 @@ router.post('/upload-file', requireAuth, upload.single('file'), async (req, res)
   }
 });
 
-router.post('/generate-flashcards', requireAuth, async (req, res) => {
-  try {
-    const { text, numCards = 10 } = req.body;
-    
-    if (!text || text.trim().length < 50) {
-      return res.status(400).json({ error: 'Text is too short' });
-    }
-    
-    const flashcards = await generateFlashcardsFromText(text, numCards);
-    
-    res.json({ success: true, flashcards });
-  } catch (error) {
-    console.error('Generate error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 export default router;
