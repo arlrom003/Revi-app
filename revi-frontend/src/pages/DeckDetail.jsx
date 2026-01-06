@@ -1,7 +1,6 @@
-// src/DeckDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getDeck, deleteDeck } from "./services/api";
+import { getDeck } from "../services/api";
 
 export default function DeckDetail() {
   const { deckId } = useParams();
@@ -71,17 +70,10 @@ export default function DeckDetail() {
           Back
         </button>
         <h1 className="text-2xl font-bold mb-2">Deck</h1>
-        <p className="text-red-500">
-          {error || "This deck could not be loaded."}
-        </p>
+        <p className="text-red-500">{error || "This deck could not be loaded."}</p>
       </div>
     );
   }
-
-  const handleStartReview = () => {
-    // Navigate to the review page for this deck
-    navigate(`/decks/${deckId}/review`);
-  };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -98,23 +90,13 @@ export default function DeckDetail() {
             <h1 className="text-3xl font-bold mb-1">{deck.name}</h1>
             <p className="text-gray-600">{deck.description}</p>
           </div>
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={handleStartReview}
-              disabled={cards.length === 0}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-60"
-            >
-              Start Review Session
-            </button>
-          </div>
         </div>
 
         <div className="mt-4 mb-6 border-t pt-4">
           <h2 className="text-xl font-semibold mb-2">Cards</h2>
           {cards.length === 0 ? (
             <p className="text-gray-500">
-              No cards in this deck yet. Add cards first, then start a review
-              session.
+              No cards in this deck yet. Use the review or edit flows you already set up.
             </p>
           ) : (
             <div className="space-y-3">

@@ -1,5 +1,13 @@
-{
-  "appId": "com.revi.revi",
-  "appName": "Revi",
-  "webDir": "dist"
-}
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.arlrom.revi',
+  appName: 'Revi',
+  webDir: 'dist',
+  server: {
+    url: 'http://10.0.2.2:5173',  // ← Point to your PC's Vite server
+    cleartext: true                // ← Allow HTTP (not HTTPS) for dev
+  }
+};
+
+export default config;

@@ -1,4 +1,3 @@
-// src/App.jsx
 import {
   BrowserRouter,
   Routes,
@@ -7,16 +6,16 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
+import { AuthProvider, useAuth } from './AuthContext';
 
-import { AuthProvider, useAuth } from "./AuthContext";
-import Login from "./Login.jsx";
-import Home from "./Home.jsx";
-import Dashboard from "./Dashboard.jsx";
-import DeckDetail from "./DeckDetail.jsx";
-import ReviewSession from "./ReviewSession.jsx";
-import History from "./History.jsx";
-import Profile from "./Profile.jsx";
-import NewDeck from "./NewDeck.jsx";
+import Login from "./pages/Login.jsx";
+import Home from "./pages/Home.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import DeckDetail from "./pages/DeckDetail.jsx";
+import ReviewSession from "./pages/ReviewSession.jsx";
+import History from "./pages/History.jsx";
+import Profile from "./pages/Profile.jsx";
+import NewDeck from "./pages/NewDeck.jsx";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();

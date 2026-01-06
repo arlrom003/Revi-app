@@ -1,0 +1,5 @@
+﻿.env
+revi-frontend/.env
+revi-backend/.env
+node_modules/
+uploads/

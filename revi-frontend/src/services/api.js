@@ -38,7 +38,6 @@ export const createDeck = async (deckData) => {
   const response = await axios.post(`${API_URL}/decks`, deckData, {
     headers,
   });
-  // backend returns { deck: {...} }
   return response.data.deck || response.data;
 };
 
@@ -47,21 +46,18 @@ export const createCard = async (cardData) => {
   const response = await axios.post(`${API_URL}/cards`, cardData, {
     headers,
   });
-  // backend returns { card: {...} }
   return response.data.card || response.data;
 };
 
 export const getDecks = async () => {
   const headers = await getAuthHeaders();
   const response = await axios.get(`${API_URL}/decks`, { headers });
-  // backend returns { decks: [...] }
   return response.data;
 };
 
 export const getDeck = async (id) => {
   const headers = await getAuthHeaders();
   const response = await axios.get(`${API_URL}/decks/${id}`, { headers });
-  // backend returns { deck, cards }
   return response.data;
 };
 
@@ -101,4 +97,10 @@ export const getAnalyticsOverview = async () => {
   return response.data;
 };
 
-
+export const deleteDeck = async (deckId) => {
+  const headers = await getAuthHeaders();
+  const response = await axios.delete(`${API_URL}/decks/${deckId}`, {
+    headers,
+  });
+  return response.data;
+};
