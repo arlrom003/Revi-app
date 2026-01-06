@@ -54,6 +54,13 @@ export const getCards = async (deckId) => {
   return response.data;
 };
 
+export const createCard = async (cardData) => {
+  const headers = await getAuthHeaders();
+  const response = await axios.post(`${API_URL}/cards`, cardData, { headers });
+  return response.data.card;
+};
+;
+
 // Reviews
 export const saveReviewSession = async (sessionData) => {
   const headers = await getAuthHeaders();
