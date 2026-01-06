@@ -143,5 +143,29 @@ router.delete('/:id', requireAuth, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// DELETE /api/decks - bulk delete multiple decks
+router.delete('/', requireAuth, async (req, res) => {
+  try {
+    const { deckIds } = req.body; // Expecting array of deck IDs
+    if (!deckIds || !Array.isArray(deckIds) || deckIds.length === 0) {
+      return res.status(400).json({ error: 'Invalid deck IDs provided' });
+    }
+
+    const token = req.headers.authorization?.split(' ')[1];
+    const supabase = getUserSupabaseClient(token);
+    
+    // Delete cards for all decks (CASCADE might handle this, but be explicit)
+    await supabase.from('cards').delete().in('deck_id', deckIds);
+    
+    // Delete all decks
+    const { error } = await supabase.from('decks').delete().in('id', deckIds);
+    if (error) throw error;
+    
+    res.json({ success: true, deletedCount: deckIds.length });
+  } catch (error) {
+    console.error('Bulk delete decks error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 export default router;

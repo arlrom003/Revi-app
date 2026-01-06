@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getDeck } from "../services/api";
+import { getDeck, deleteDeck } from "../services/api";
 
 export default function DeckDetail() {
   const { deckId } = useParams();
@@ -8,6 +8,7 @@ export default function DeckDetail() {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +17,7 @@ export default function DeckDetail() {
         setLoading(true);
         setError("");
 
-        // Don’t fetch when navigating to /decks/new
+        // Don't fetch when navigating to /decks/new
         if (!deckId || deckId === "new") {
           setLoading(false);
           setError(
@@ -51,6 +52,31 @@ export default function DeckDetail() {
 
     loadDeck();
   }, [deckId]);
+
+  const handleDeleteDeck = async () => {
+    if (!window.confirm(`Are you sure you want to delete "${deck.name}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      await deleteDeck(deckId);
+      // Navigate back to dashboard after successful deletion
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Error deleting deck:", err);
+      alert("Failed to delete deck. Please try again.");
+      setDeleting(false);
+    }
+  };
+
+  const handleStartReview = () => {
+    if (cards.length === 0) {
+      alert("This deck has no cards to review.");
+      return;
+    }
+    navigate(`/review/${deckId}`);
+  };
 
   if (loading) {
     return (
@@ -90,10 +116,26 @@ export default function DeckDetail() {
             <h1 className="text-3xl font-bold mb-1">{deck.name}</h1>
             <p className="text-gray-600">{deck.description}</p>
           </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleStartReview}
+              disabled={cards.length === 0}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              Start Review Session
+            </button>
+            <button
+              onClick={handleDeleteDeck}
+              disabled={deleting}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {deleting ? "Deleting..." : "Delete Deck"}
+            </button>
+          </div>
         </div>
 
         <div className="mt-4 mb-6 border-t pt-4">
-          <h2 className="text-xl font-semibold mb-2">Cards</h2>
+          <h2 className="text-xl font-semibold mb-2">Cards ({cards.length})</h2>
           {cards.length === 0 ? (
             <p className="text-gray-500">
               No cards in this deck yet. Use the review or edit flows you already set up.

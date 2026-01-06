@@ -1,141 +1,56 @@
 import express from 'express';
-import { supabase } from '../config/supabase.js';
-import { requireAuth } from '../middleware/auth.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import authRoutes from './routes/auth.js';
+import decksRoutes from './routes/decks.js';
+import cardsRoutes from './routes/cards.js';
+import reviewsRoutes from './routes/reviews.js';
+import uploadRoutes from './routes/upload.js';
+import analyticsRoutes from './routes/analytics.js';
 
-const router = express.Router();
+dotenv.config();
 
-router.get('/dashboard', async (req, res) => {
-  try {
-    const { data: decks } = await supabase
-      .from('decks')
-      .select('id, name')
-      .eq('user_id', req.user.id);
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    const deckIds = decks.map(d => d.id);
+// Middleware
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
+app.use(express.json());
 
-    const { count: totalCards } = await supabase
-      .from('cards')
-      .select('id', { count: 'exact', head: true })
-      .in('deck_id', deckIds);
-
-    const { data: sessions } = await supabase
-      .from('review_sessions')
-      .select('*')
-      .eq('user_id', req.user.id);
-
-    const totalAttempts = sessions.length;
-    const totalStudyTime = sessions.reduce(
-      (sum, s) => sum + (s.duration_seconds || 0),
-      0
-    );
-
-    let totalEasy = 0, totalMedium = 0, totalHard = 0;
-    sessions.forEach(s => {
-      totalEasy += s.easy_count;
-      totalMedium += s.medium_count;
-      totalHard += s.hard_count;
-    });
-
-    const totalRatings = totalEasy + totalMedium + totalHard;
-    const overallRatings = {
-      easy: totalRatings > 0 ? Math.round((totalEasy / totalRatings) * 100) : 0,
-      medium: totalRatings > 0 ? Math.round((totalMedium / totalRatings) * 100) : 0,
-      hard: totalRatings > 0 ? Math.round((totalHard / totalRatings) * 100) : 0,
-    };
-
-    const deckMastery = await Promise.all(
-      decks.map(async (deck) => {
-        const { data: recentSessions } = await supabase
-          .from('review_sessions')
-          .select('easy_count, total_cards')
-          .eq('deck_id', deck.id)
-          .order('started_at', { ascending: false })
-          .limit(3);
-
-        if (!recentSessions || recentSessions.length === 0) {
-          return { deck_id: deck.id, deck_name: deck.name, mastery: 0 };
-        }
-
-        const avgEasyPct =
-          recentSessions.reduce((sum, s) => {
-            return sum + (s.total_cards > 0 ? (s.easy_count / s.total_cards) * 100 : 0);
-          }, 0) / recentSessions.length;
-
-        return {
-          deck_id: deck.id,
-          deck_name: deck.name,
-          mastery: Math.round(avgEasyPct),
-        };
-      })
-    );
-
-    res.json({
-      totalDecks: decks.length,
-      totalCards,
-      totalAttempts,
-      totalStudyTime,
-      deckMastery,
-      overallRatings,
-    });
-  } catch (error) {
-    console.error('Dashboard error:', error);
-    res.status(500).json({ error: error.message });
-  }
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
 });
 
-router.get('/history', requireAuth, async (req, res) => {
-  try {
-    const { data: sessions } = await supabase
-      .from('review_sessions')
-      .select(`
-        *,
-        decks (name)
-      `)
-      .eq('user_id', req.user.id)
-      .order('started_at', { ascending: false });
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/decks', decksRoutes);
+app.use('/api/cards', cardsRoutes);
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/analytics', analyticsRoutes);  // This should mount analytics routes at /api/analytics
 
-    res.json({ sessions });
-  } catch (error) {
-    console.error('History error:', error);
-    res.status(500).json({ error: error.message });
-  }
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
 });
 
-router.get('/overview', requireAuth, async (req, res) => {
-  try {
-    const { data: decks } = await supabase
-      .from('decks')
-      .select('id')
-      .eq('user_id', req.user.id);
-
-    const deckIds = decks.map(d => d.id);
-
-    const { count: totalCards } = await supabase
-      .from('cards')
-      .select('id', { count: 'exact', head: true })
-      .in('deck_id', deckIds);
-
-    const { data: sessions } = await supabase
-      .from('review_sessions')
-      .select('*')
-      .eq('user_id', req.user.id);
-
-    const totalAttempts = sessions.length;
-    const totalStudyTime = sessions.reduce(
-      (sum, s) => sum + (s.duration_seconds || 0),
-      0
-    );
-
-    res.json({
-      totalDecks: decks.length,
-      totalCards,
-      totalAttempts,
-      totalStudyTime,
-    });
-  } catch (error) {
-    console.error('Overview error:', error);
-    res.status(500).json({ error: error.message });
-  }
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
 });
 
-export default router;
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+});
