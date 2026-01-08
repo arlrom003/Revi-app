@@ -268,6 +268,6 @@ MIT License - Free to use for learning and educational purposes.
 
 ## 👨‍💻 Author
 
-Created as a computer science student project to demonstrate full-stack development with React, Node.js, Supabase, and OpenRouter AI integration.
+Created as a Information Technology student project to demonstrate full-stack development with React, Node.js, Supabase, and OpenRouter AI integration.
 
 **Questions?** Open an issue on GitHub or reach out!
