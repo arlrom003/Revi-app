@@ -1,8 +1,8 @@
 # Revi - AI-Powered Flashcard Study Tracker
 
-**A mobile-first full-stack application** for managing and tracking flashcard study sessions with AI-powered analytics. Built with **React + Vite** (frontend), **Node.js/Express** (backend), and deployed as both a **web app** and **Android APK**.
+**A mobile-first full-stack application** for managing and tracking flashcard study sessions with AI-powered analytics. Built with **React + Vite** (frontend) and **Node.js/Express** (backend).
 
-Revi uses Supabase for secure authentication and database management, OpenRouter for AI-powered flashcard generation, and Capacitor for native Android deployment.
+Revi uses Supabase for secure authentication and database management, and OpenRouter for AI-powered flashcard generation.
 
 ---
 
@@ -25,7 +25,6 @@ Revi uses Supabase for secure authentication and database management, OpenRouter
 - 🎨 **Modern UI with Tailwind CSS**
 - 🔒 **Row-level security** with Supabase RLS
 - 📤 **CSV import/export** functionality
-- 📦 **Android APK** deployment via Capacitor
 
 ---
 
@@ -37,7 +36,6 @@ Revi uses Supabase for secure authentication and database management, OpenRouter
 - **React Router** - Navigation
 - **Tailwind CSS** - Styling
 - **Recharts** - Data visualization
-- **Capacitor** - Native Android packaging
 - **Axios** - HTTP client
 
 ### Backend
@@ -107,37 +105,6 @@ Start frontend:
 npm run dev
 # Frontend runs on http://localhost:5173
 ```
-
----
-
-## 📱 Mobile Deployment (Android APK)
-
-Revi can be built as a native Android APK using **Capacitor**.
-
-### Prerequisites
-- **Android Studio** installed
-- **Android SDK** (API level 21+)
-
-### Build APK
-```bash
-cd revi-frontend
-npm run build          # Build web assets
-npx cap sync          # Sync to Android project
-npx cap open android  # Open in Android Studio
-```
-
-In Android Studio:
-1. **Build → Build APK(s)** for debug APK
-2. **Build → Generate Signed Bundle/APK** for release (Play Store)
-
-The APK will be available at:
-- Debug: `android/app/build/outputs/apk/debug/app-debug.apk`
-- Release: `android/app/build/outputs/bundle/release/app-release.aab`
-
-### Important Notes for Mobile
-- Update `VITE_API_URL` to your production backend URL (not localhost)
-- Ensure backend is deployed on HTTPS (e.g., Render, Vercel, AWS)
-- Test on real device or Android emulator
 
 ---
 
@@ -259,9 +226,6 @@ Revi-app/
 │   ├── server.js            # Main server file
 │   └── package.json
 │
-├── android/                 # Capacitor Android project
-│   └── app/build/outputs/   # APK/AAB outputs
-│
 └── README.md
 ```
 
@@ -280,11 +244,6 @@ Revi-app/
 1. Build: `npm run build`
 2. Deploy `dist/` folder
 3. Set `VITE_API_URL` to your backend URL
-
-### Android (Google Play Store)
-1. Build signed APK: `Build → Generate Signed Bundle/APK`
-2. Create Google Play Console account
-3. Upload AAB file and follow submission guidelines
 
 ---
 
@@ -309,6 +268,6 @@ MIT License - Free to use for learning and educational purposes.
 
 ## 👨‍💻 Author
 
-Created as a computer science student project to demonstrate full-stack development, mobile deployment, and AI integration.
+Created as a computer science student project to demonstrate full-stack development with React, Node.js, Supabase, and OpenRouter AI integration.
 
 **Questions?** Open an issue on GitHub or reach out!
